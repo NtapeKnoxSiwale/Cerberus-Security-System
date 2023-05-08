@@ -1,11 +1,16 @@
 package dev.knox.cerberus;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.view.View;
+import android.widget.Button;
+
 import androidx.core.app.NotificationCompat;
 
 public class AlarmSystem {
@@ -15,10 +20,19 @@ public class AlarmSystem {
     private static final int NOTIFICATION_ID = 1;
 
     private Context context;
+    private Vibrator vibrator;
+    private MediaPlayer mediaPlayer;
+    private boolean isPlayingAlarm;
 
-    public AlarmSystem(Context context) {
+    private Button stopAlarmButton;
+
+    public AlarmSystem(Context context, Button stopAlarmButton) {
         this.context = context;
+        this.stopAlarmButton = stopAlarmButton;
         createNotificationChannel();
+        vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        mediaPlayer = MediaPlayer.create(context, R.raw.alarm_sound_1);
+        isPlayingAlarm = false;
     }
 
     private void createNotificationChannel() {
@@ -36,8 +50,9 @@ public class AlarmSystem {
         }
     }
 
+
     public void checkWeightAndNotify(String roomName, double weight) {
-        if (weight >= 0 && weight <= 20) {
+        if (weight > 0 && weight <= 20) {
             String message = context.getString(R.string.notification_message, weight, roomName);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.drawable.notification_icon)
@@ -46,12 +61,50 @@ public class AlarmSystem {
                     .setChannelId(CHANNEL_ID)
                     .setAutoCancel(true);
             NotificationManager manager = context.getSystemService(NotificationManager.class);
-            if (roomName.equals("Room1")) {
-                manager.notify(NOTIFICATION_ID, builder.build());
-            } else if (roomName.equals("Room2")) {
-                manager.notify(NOTIFICATION_ID + 1, builder.build());
-            }
+            manager.notify(NOTIFICATION_ID, builder.build());
+            vibrate();
+            stopAlarmButton.setEnabled(false);
+            stopAlarmButton.setAlpha(0.5f);
+        } else if (weight > 20 && weight < 50) {
+            stopAlarm();
+            stopAlarmButton.setEnabled(false);
+            stopAlarmButton.setAlpha(0.5f);
+        } else if (weight >= 50) {
+            soundAlarm();
+            vibrate();
+            stopAlarmButton.setEnabled(true);
+            stopAlarmButton.setAlpha(1.0f);
+        } else if (isPlayingAlarm) {
+            stopAlarm();
         }
     }
 
+
+
+    private void vibrate() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createOneShot(1000, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            vibrator.vibrate(1000);
+        }
+    }
+
+    private void soundAlarm() {
+        if (!isPlayingAlarm) {
+            mediaPlayer.setLooping(true);
+            mediaPlayer.start();
+            isPlayingAlarm = true;
+        }
+    }
+
+    void stopAlarm() {
+        if (isPlayingAlarm) {
+            mediaPlayer.setLooping(false);
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = MediaPlayer.create(context, R.raw.alarm_sound_1);
+            isPlayingAlarm = false;
+            stopAlarmButton.setVisibility(View.GONE);
+        }
+    }
 }

@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -15,11 +17,19 @@ import com.google.firebase.database.ValueEventListener;
 import java.text.DecimalFormat;
 
 public class MainActivity extends AppCompatActivity {
+    // UI elements
+    private TextView room1WeightTextView;
+    private TextView room2WeightTextView;
+    private Button stopAlarmButton;
 
-    private TextView room1WeightTextView, room2WeightTextView;
-    private DatabaseReference room1Ref, room2Ref;
+    // Firebase database references
+    private DatabaseReference room1Ref;
+    private DatabaseReference room2Ref;
+
+    // Decimal Formatter for weight format
     private DecimalFormat decimalFormat;
 
+    // Alarm system instance
     private AlarmSystem alarmSystem;
 
     @Override
@@ -30,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
         // Initialize UI elements
         room1WeightTextView = findViewById(R.id.room1_weight);
         room2WeightTextView = findViewById(R.id.room2_weight);
+        stopAlarmButton = findViewById(R.id.stop_alarm_button);
+        stopAlarmButton.setVisibility(View.GONE);
 
         // Initialize Firebase database references
         DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
@@ -39,7 +51,8 @@ public class MainActivity extends AppCompatActivity {
         // Initialize Decimal Formatter for weight format
         decimalFormat = new DecimalFormat("0.00");
 
-        alarmSystem = new AlarmSystem(this);
+        // Initialize Alarm system instance
+        alarmSystem = new AlarmSystem(this, stopAlarmButton);
 
         // Attach event listeners to database references
         room1Ref.addValueEventListener(new ValueEventListener() {
@@ -49,6 +62,9 @@ public class MainActivity extends AppCompatActivity {
                 if (weight != null) {
                     String weightText = decimalFormat.format(weight) + " kg";
                     room1WeightTextView.setText(weightText);
+                    if (weight > 50) {
+                        stopAlarmButton.setVisibility(View.VISIBLE);
+                    }
                     alarmSystem.checkWeightAndNotify("Room1", weight);
                 }
             }
@@ -66,6 +82,9 @@ public class MainActivity extends AppCompatActivity {
                 if (weight != null) {
                     String weightText = decimalFormat.format(weight) + " kg";
                     room2WeightTextView.setText(weightText);
+                    if (weight > 50) {
+                        stopAlarmButton.setVisibility(View.VISIBLE);
+                    }
                     alarmSystem.checkWeightAndNotify("Room2", weight);
                 }
             }
@@ -75,5 +94,12 @@ public class MainActivity extends AppCompatActivity {
                 // Handle error
             }
         });
+
+        // Attach onClick listener to stop alarm button
+        stopAlarmButton.setOnClickListener(v -> {
+            alarmSystem.stopAlarm();
+            stopAlarmButton.setVisibility(View.GONE);
+        });
     }
 }
+
