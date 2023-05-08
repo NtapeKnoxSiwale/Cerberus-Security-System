@@ -1,4 +1,9 @@
 <resources>
+
+    <string name="notification_channel_description">Notification for weight alarms</string>
+    <string name="notification_title">Weight Alarm</string>
+    <string name="notification_message">Hi user, we have detected a weight of %.2f kg in %s</string>
+
     <string name="app_name">Cerberus</string>
     <string name="title_activity_main">MainActivity</string>
     <!-- Strings used for fragments for navigation -->

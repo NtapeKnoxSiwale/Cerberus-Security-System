@@ -20,6 +20,8 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference room1Ref, room2Ref;
     private DecimalFormat decimalFormat;
 
+    private AlarmSystem alarmSystem;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
         // Initialize Decimal Formatter for weight format
         decimalFormat = new DecimalFormat("0.00");
 
+        alarmSystem = new AlarmSystem(this);
+
         // Attach event listeners to database references
         room1Ref.addValueEventListener(new ValueEventListener() {
             @Override
@@ -45,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
                 if (weight != null) {
                     String weightText = decimalFormat.format(weight) + " kg";
                     room1WeightTextView.setText(weightText);
+                    alarmSystem.checkWeightAndNotify("Room1", weight);
                 }
             }
 
@@ -61,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 if (weight != null) {
                     String weightText = decimalFormat.format(weight) + " kg";
                     room2WeightTextView.setText(weightText);
+                    alarmSystem.checkWeightAndNotify("Room2", weight);
                 }
             }
 
