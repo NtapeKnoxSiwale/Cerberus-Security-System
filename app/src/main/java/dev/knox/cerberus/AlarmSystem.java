@@ -17,23 +17,25 @@ public class AlarmSystem {
 
     private static final String CHANNEL_ID = "alarm_channel";
     private static final String CHANNEL_NAME = "Alarm Channel";
-    private static final int NOTIFICATION_ID = 1;
+    private static int NOTIFICATION_ID = 1;
 
-    private Context context;
-    private Vibrator vibrator;
+    private final Context context;
+    private final Vibrator vibrator;
     private MediaPlayer mediaPlayer;
     private boolean isPlayingAlarm;
 
-    private Button stopAlarmButton;
+    private final Button stopAlarmButton;
 
-    public AlarmSystem(Context context, Button stopAlarmButton) {
+    public AlarmSystem(Context context, Button stopAlarmButton, int notificationId) {
         this.context = context;
         this.stopAlarmButton = stopAlarmButton;
+        NOTIFICATION_ID = notificationId;
         createNotificationChannel();
         vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         mediaPlayer = MediaPlayer.create(context, R.raw.alarm_sound_1);
         isPlayingAlarm = false;
     }
+
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -105,6 +107,9 @@ public class AlarmSystem {
             mediaPlayer = MediaPlayer.create(context, R.raw.alarm_sound_1);
             isPlayingAlarm = false;
             stopAlarmButton.setVisibility(View.GONE);
+            NotificationManager manager = context.getSystemService(NotificationManager.class);
+            manager.cancel(NOTIFICATION_ID);
         }
     }
+
 }

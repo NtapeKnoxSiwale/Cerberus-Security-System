@@ -22,10 +22,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView room2WeightTextView;
     private Button stopAlarmButton;
 
-    // Firebase database references
-    private DatabaseReference room1Ref;
-    private DatabaseReference room2Ref;
-
     // Decimal Formatter for weight format
     private DecimalFormat decimalFormat;
 
@@ -45,14 +41,16 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize Firebase database references
         DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-        room1Ref = rootRef.child("Room1");
-        room2Ref = rootRef.child("Room2");
+        // Firebase database references
+        DatabaseReference room1Ref = rootRef.child("Room1");
+        DatabaseReference room2Ref = rootRef.child("Room2");
 
         // Initialize Decimal Formatter for weight format
         decimalFormat = new DecimalFormat("0.00");
 
         // Initialize Alarm system instance
-        alarmSystem = new AlarmSystem(this, stopAlarmButton);
+        int notificationId = 1; // or any other desired value
+        alarmSystem = new AlarmSystem(this, stopAlarmButton, notificationId);
 
         // Attach event listeners to database references
         room1Ref.addValueEventListener(new ValueEventListener() {
