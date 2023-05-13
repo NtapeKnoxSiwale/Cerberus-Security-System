@@ -1,15 +1,20 @@
 package dev.knox.cerberus;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Patterns;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
@@ -35,14 +40,28 @@ public class AuthActivity extends AppCompatActivity {
     private static final String AUTHENTICATION_FAILED_ERROR = "Authentication failed.";
 
     private EditText emailLoginEditText, passwordLoginEditText, emailRegisterEditText, passwordRegisterEditText, firstNameEditText, lastNameEditText, businessNameEditText, phoneNumberEditText;
-
     private FirebaseAuth mAuth;
+
+    private ProgressBar progressBar;
+
+    private View overlayView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dev.knox.cerberus.databinding.ActivityAuthBinding binding = ActivityAuthBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        // Inflate the overlay layout and hide it by default
+        overlayView = LayoutInflater.from(this).inflate(R.layout.overlay_layout, null);
+        overlayView.setVisibility(View.GONE);
+
+        // Add the overlay view to the activity's layout
+        ViewGroup rootView = findViewById(android.R.id.content);
+        rootView.addView(overlayView);
+
+        progressBar = findViewById(R.id.progressBar);
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -70,7 +89,8 @@ public class AuthActivity extends AppCompatActivity {
         // Enable button when the user starts typing in the email field
         emailLoginEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -78,7 +98,8 @@ public class AuthActivity extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         forgotPassword.setOnClickListener(v -> {
@@ -91,17 +112,22 @@ public class AuthActivity extends AppCompatActivity {
             }
 
             // Show loading indicator while sending the password reset email
-            ProgressDialog progressDialog = ProgressDialog.show(this, "", getString(R.string.loading_message), true);
+            progressBar.setVisibility(View.VISIBLE);
+            showOverlay();
 
             mAuth.sendPasswordResetEmail(email)
                     .addOnCompleteListener(task -> {
-                        // Dismiss the loading indicator
-                        progressDialog.dismiss();
 
                         if (task.isSuccessful()) {
+                            // Hide the loading indicator
+                            progressBar.setVisibility(View.GONE);
+                            hideOverlay();
                             // Password reset email sent successfully
                             Toast.makeText(this, R.string.password_reset_email_sent_message, Toast.LENGTH_SHORT).show();
                         } else {
+                            // Hide the loading indicator
+                            progressBar.setVisibility(View.GONE);
+                            hideOverlay();
                             // Password reset email failed to send
                             Exception exception = task.getException();
                             Log.w(TAG, "sendPasswordResetEmail: failed", exception);
@@ -113,31 +139,48 @@ public class AuthActivity extends AppCompatActivity {
 
         // Set TextChangedListener for password input
         passwordLoginEditText.addTextChangedListener(getPasswordWatcher());
+        setMaxLength(passwordLoginEditText);
+
 
         login.setOnClickListener(v -> {
             String email = emailLoginEditText.getText().toString().trim();
             String password = passwordLoginEditText.getText().toString();
 
-            if (!isValidEmail(email)) {
+            validateEmailAndPassword(email, password);
+
+            if (isValidEmail(email)) {
                 emailLoginEditText.setError("Please enter a valid email address");
                 emailLoginEditText.requestFocus();
                 return;
             }
 
-            if (!isValidPassword(password)) {
+            if (isValidPassword(password)) {
                 passwordLoginEditText.setError("Password must be at least 6 characters long");
                 passwordLoginEditText.requestFocus();
                 return;
             }
 
+            // Show progress bar while signing in
+            progressBar.setVisibility(View.VISIBLE);
+            showOverlay();
+
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
+
                         if (task.isSuccessful()) {
+                            // Hide progress bar when sign-in is complete
+                            progressBar.setVisibility(View.INVISIBLE);
+                            hideOverlay();
+
                             // User has signed in successfully, navigate to the main activity
-                            Intent intent = new Intent(AuthActivity.this, MainActivity.class);
+                            Intent intent = new Intent(this, MainActivity.class);
                             startActivity(intent);
                             finish();
                         } else {
+                            // Hide the loading indicator
+                            progressBar.setVisibility(View.GONE);
+                            hideOverlay();
+
                             onSignInFailure(task.getException());
                         }
                     })
@@ -145,18 +188,40 @@ public class AuthActivity extends AppCompatActivity {
         });
 
 
+        passwordRegisterEditText.addTextChangedListener(getPasswordWatcher());
+        setMaxLength(passwordRegisterEditText);
+
+
         Button next = findViewById(R.id.nextButton);
         next.setOnClickListener(v -> {
             String email = emailRegisterEditText.getText().toString().trim();
             String password = passwordRegisterEditText.getText().toString().trim();
 
-            if (!validateEmailAndPassword(email, password)) {
+            validateEmailAndPassword(email, password);
+
+            if (isValidEmail(email)) {
+                emailRegisterEditText.setError("Please enter a valid email address");
+                emailRegisterEditText.requestFocus();
                 return;
             }
 
+            if (isValidPassword(password)) {
+                passwordRegisterEditText.setError("Password must be at least 6 characters long");
+                passwordRegisterEditText.requestFocus();
+                return;
+            }
+
+            // Show loading indicator while sending the password reset email
+            progressBar.setVisibility(View.VISIBLE);
+            showOverlay();
+
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
+
                         if (task.isSuccessful()) {
+                            // Hide progress bar when sign-in is complete
+                            progressBar.setVisibility(View.INVISIBLE);
+                            hideOverlay();
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
                             assert user != null;
@@ -206,6 +271,9 @@ public class AuthActivity extends AppCompatActivity {
                                         }
                                     });
                         } else {
+                            // Hide the loading indicator
+                            progressBar.setVisibility(View.GONE);
+                            hideOverlay();
                             // If sign up fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
                             Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show();
@@ -215,7 +283,37 @@ public class AuthActivity extends AppCompatActivity {
         });
 
         Button saveButton = findViewById(R.id.saveButton);
-        saveButton.setOnClickListener(view -> saveData());
+        // Disable button initially
+        saveButton.setEnabled(false);
+
+        final TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Check if all fields are non-empty and enable button if so
+                boolean allFilled = !firstNameEditText.getText().toString().isEmpty() &&
+                        !lastNameEditText.getText().toString().isEmpty() &&
+                        !businessNameEditText.getText().toString().isEmpty() &&
+                        !phoneNumberEditText.getText().toString().isEmpty();
+                saveButton.setEnabled(allFilled);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        };
+        // Add text change listeners
+        firstNameEditText.addTextChangedListener(textWatcher);
+        lastNameEditText.addTextChangedListener(textWatcher);
+        businessNameEditText.addTextChangedListener(textWatcher);
+        phoneNumberEditText.addTextChangedListener(textWatcher);
+
+        saveButton.setOnClickListener(view ->
+                saveData()
+        );
     }
 
     private TextWatcher getPasswordWatcher() {
@@ -228,7 +326,7 @@ public class AuthActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String password = s.toString().trim();
-                passwordLoginEditText.setError(password.length() < 6 ? "Password must be at least 6 characters long" : null);
+                passwordLoginEditText.setError(password.length() < 8 ? "Password must be at least 6 characters long" : null);
             }
 
             @Override
@@ -238,26 +336,24 @@ public class AuthActivity extends AppCompatActivity {
         };
     }
 
-    private boolean validateEmailAndPassword(String email, String password) {
+    private void validateEmailAndPassword(String email, String password) {
         if (TextUtils.isEmpty(email)) {
             emailRegisterEditText.setError("Please enter your email");
             emailRegisterEditText.requestFocus();
-            return false;
+            return;
         }
 
         if (TextUtils.isEmpty(password)) {
             passwordRegisterEditText.setError("Please enter your password");
             passwordRegisterEditText.requestFocus();
-            return false;
+            return;
         }
 
         if (password.length() < 6) {
-            passwordRegisterEditText.setError("Password must be at least 6 characters long");
+            passwordRegisterEditText.setError("Password must not be least 6 characters long");
             passwordRegisterEditText.requestFocus();
-            return false;
         }
 
-        return true;
     }
 
 
@@ -266,6 +362,11 @@ public class AuthActivity extends AppCompatActivity {
         String lastName = lastNameEditText.getText().toString().trim();
         String businessName = businessNameEditText.getText().toString().trim();
         String phoneNumber = phoneNumberEditText.getText().toString().trim();
+
+        if (firstName.isEmpty() && lastName.isEmpty() && businessName.isEmpty() && phoneNumber.isEmpty()) {
+            Toast.makeText(this, "Please fill in at least one field", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         FirebaseUser user = mAuth.getCurrentUser();
         assert user != null;
@@ -277,19 +378,32 @@ public class AuthActivity extends AppCompatActivity {
         data.put("business_name", businessName);
         data.put("phone_number", phoneNumber);
 
+        // Show the progress bar
+        progressBar.setVisibility(View.VISIBLE);
+        showOverlay();
+
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
         usersRef.child(uid).setValue(data)
                 .addOnSuccessListener(aVoid -> {
+
+                    progressBar.setVisibility(View.GONE);
+                    hideOverlay();
+
                     Log.d(TAG, "Information saved successfully");
                     Toast.makeText(this, "Information saved successfully", Toast.LENGTH_SHORT).show();
                     // Data saved successfully, open MainActivity
                     openMainActivity();
                 })
                 .addOnFailureListener(e -> {
-                    // Data failed to save, show error message
+                    // Hide the loading indicator
+                    progressBar.setVisibility(View.GONE);
+                    hideOverlay();
+                    hideOverlay();
                     Toast.makeText(AuthActivity.this, "Failed to save user data.", Toast.LENGTH_SHORT).show();
                 });
     }
+
+
 
     private void onSignInFailure(Exception exception) {
         if (exception instanceof FirebaseAuthInvalidUserException) {
@@ -314,11 +428,11 @@ public class AuthActivity extends AppCompatActivity {
     }
 
     private boolean isValidEmail(String email) {
-        return !TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches();
+        return TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
     private boolean isValidPassword(String password) {
-        return !TextUtils.isEmpty(password) && password.length() >= 6;
+        return TextUtils.isEmpty(password) || password.length() < 6;
     }
 
     @Override
@@ -331,5 +445,23 @@ public class AuthActivity extends AppCompatActivity {
             super.onBackPressed();
         }
     }
+
+    private void setMaxLength(EditText editText) {
+        InputFilter[] filters = new InputFilter[1];
+        filters[0] = new InputFilter.LengthFilter(8);
+        editText.setFilters(filters);
+    }
+
+    private void showOverlay() {
+        overlayView.setVisibility(View.VISIBLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+    }
+
+    private void hideOverlay() {
+        overlayView.setVisibility(View.GONE);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+    }
+
 }
 

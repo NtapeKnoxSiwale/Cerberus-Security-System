@@ -99,7 +99,7 @@
                 android:id="@+id/phoneNumberEditText"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:inputType="text"
+                android:inputType="phone"
                 android:textColorHint="#546E7A" />
 
         </com.google.android.material.textfield.TextInputLayout>

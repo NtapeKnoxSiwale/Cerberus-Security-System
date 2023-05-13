@@ -1,8 +1,11 @@
 package dev.knox.cerberus;
+import static dev.knox.cerberus.R.id.progressBar;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
