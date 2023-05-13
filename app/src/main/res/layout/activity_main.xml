@@ -22,7 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="Room 1"
+            android:text="@string/room_1"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -34,7 +34,7 @@
             android:background="@drawable/weight_box"
             android:gravity="center"
             android:padding="30dp"
-            android:text="0 kg"
+            android:text="@string/_0_kg"
             android:textColor="@color/black"
             android:textSize="16sp" />
 
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp"
-            android:text="Room 2"
+            android:text="@string/room_2"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -55,7 +55,7 @@
             android:background="@drawable/weight_box"
             android:gravity="center"
             android:padding="30dp"
-            android:text="0 kg"
+            android:text="@string/_0_kg"
             android:textColor="@color/black"
             android:textSize="16sp" />
 
@@ -67,15 +67,23 @@
         android:layout_height="60dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="20dp"
-        android:background="#FF0000"
-        android:text="Stop Alarm"
         android:enabled="false"
-        android:alpha="0.5"
-        android:visibility="visible"
+        android:text="@string/stop_alarm"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout"/>
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintVertical_bias="0.8" />
+
+    <Button
+        android:id="@+id/logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Logout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

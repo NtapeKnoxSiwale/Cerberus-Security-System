@@ -1,13 +1,15 @@
 package dev.knox.cerberus;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -23,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private Button stopAlarmButton;
 
     // Decimal Formatter for weight format
-    private DecimalFormat decimalFormat;
+    private final DecimalFormat decimalFormat = new DecimalFormat("0.00");
 
     // Alarm system instance
     private AlarmSystem alarmSystem;
@@ -37,67 +39,73 @@ public class MainActivity extends AppCompatActivity {
         room1WeightTextView = findViewById(R.id.room1_weight);
         room2WeightTextView = findViewById(R.id.room2_weight);
         stopAlarmButton = findViewById(R.id.stop_alarm_button);
-        stopAlarmButton.setVisibility(View.GONE);
 
         // Initialize Firebase database references
-        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-        // Firebase database references
-        DatabaseReference room1Ref = rootRef.child("Room1");
-        DatabaseReference room2Ref = rootRef.child("Room2");
-
-        // Initialize Decimal Formatter for weight format
-        decimalFormat = new DecimalFormat("0.00");
+        initializeFirebase();
 
         // Initialize Alarm system instance
-        int notificationId = 1; // or any other desired value
-        alarmSystem = new AlarmSystem(this, stopAlarmButton, notificationId);
+        alarmSystem = new AlarmSystem(this, stopAlarmButton, 1);
 
-        // Attach event listeners to database references
-        room1Ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Double weight = snapshot.getValue(Double.class);
-                if (weight != null) {
-                    String weightText = decimalFormat.format(weight) + " kg";
-                    room1WeightTextView.setText(weightText);
-                    if (weight > 50) {
-                        stopAlarmButton.setVisibility(View.VISIBLE);
-                    }
-                    alarmSystem.checkWeightAndNotify("Room1", weight);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // Handle error
-            }
+        Button logoutButton = findViewById(R.id.logout);
+        logoutButton.setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+            Intent intent = new Intent(this, AuthActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
         });
 
-        room2Ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Double weight = snapshot.getValue(Double.class);
-                if (weight != null) {
-                    String weightText = decimalFormat.format(weight) + " kg";
-                    room2WeightTextView.setText(weightText);
-                    if (weight > 50) {
-                        stopAlarmButton.setVisibility(View.VISIBLE);
-                    }
-                    alarmSystem.checkWeightAndNotify("Room2", weight);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // Handle error
-            }
-        });
 
         // Attach onClick listener to stop alarm button
         stopAlarmButton.setOnClickListener(v -> {
             alarmSystem.stopAlarm();
-            stopAlarmButton.setVisibility(View.GONE);
         });
     }
-}
 
+    private void initializeFirebase() {
+        // Firebase user object
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            // User is not signed in
+            return;
+        }
+
+        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference userRef = rootRef.child("users").child(user.getUid());
+        // Firebase database references
+        DatabaseReference room1Ref = userRef.child("rooms").child("room1");
+        DatabaseReference room2Ref = userRef.child("rooms").child("room2");
+
+        ValueEventListener valueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String roomName = snapshot.getKey();
+                Double weightValue = snapshot.getValue(Double.class);
+                if (weightValue != null) {
+                    CharSequence weightText = decimalFormat.format(weightValue) + " kg";
+                    assert roomName != null;
+                    if (roomName.equals("room1")) {
+                        room1WeightTextView.setText(weightText);
+                        alarmSystem.checkWeightAndNotify("room1", weightValue);
+                    } else if (roomName.equals("room2")) {
+                        room2WeightTextView.setText(weightText);
+                        alarmSystem.checkWeightAndNotify("room2", weightValue);
+                    }
+                    if (weightValue > 50) {
+                        stopAlarmButton.setVisibility(View.VISIBLE);
+                    } else {
+                        stopAlarmButton.setVisibility(View.GONE);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle error
+            }
+        };
+
+        room1Ref.addValueEventListener(valueEventListener);
+        room2Ref.addValueEventListener(valueEventListener);
+    }
+}

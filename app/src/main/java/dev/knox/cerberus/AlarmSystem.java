@@ -8,7 +8,6 @@ import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.view.View;
 import android.widget.Button;
 
 import androidx.core.app.NotificationCompat;
@@ -54,7 +53,11 @@ public class AlarmSystem {
 
 
     public void checkWeightAndNotify(String roomName, double weight) {
+        // User set trigger 1: notification
         if (weight > 0 && weight <= 20) {
+            // Grey out the button and disable it
+            stopAlarmButton.setEnabled(false);
+
             String message = context.getString(R.string.notification_message, weight, roomName);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.drawable.notification_icon)
@@ -65,23 +68,35 @@ public class AlarmSystem {
             NotificationManager manager = context.getSystemService(NotificationManager.class);
             manager.notify(NOTIFICATION_ID, builder.build());
             vibrate();
-            stopAlarmButton.setEnabled(false);
-            stopAlarmButton.setAlpha(0.5f);
-        } else if (weight > 20 && weight < 50) {
+        }
+        // user set trigger 2: notification + sound alarm
+        // password promote
+        else if (weight > 20 && weight < 50) {
+            stopAlarmButton.setEnabled(true);
             stopAlarm();
-            stopAlarmButton.setEnabled(false);
-            stopAlarmButton.setAlpha(0.5f);
-        } else if (weight >= 50) {
+        } else if (isPlayingAlarm) {
+            stopAlarmButton.setEnabled(true);
+            stopAlarm();
+        }
+
+        // Override AlertSystem: promote password
+        else if (weight >= 50) {
             soundAlarm();
             vibrate();
             stopAlarmButton.setEnabled(true);
-            stopAlarmButton.setAlpha(1.0f);
-        } else if (isPlayingAlarm) {
-            stopAlarm();
         }
     }
 
-
+    private void soundAlarm() {
+        if (!isPlayingAlarm) {
+            mediaPlayer.setLooping(true);
+            mediaPlayer.start();
+            isPlayingAlarm = true;
+            stopAlarmButton.setEnabled(true);
+        } else {
+            stopAlarmButton.setEnabled(true);
+        }
+    }
 
     private void vibrate() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -91,22 +106,15 @@ public class AlarmSystem {
         }
     }
 
-    private void soundAlarm() {
-        if (!isPlayingAlarm) {
-            mediaPlayer.setLooping(true);
-            mediaPlayer.start();
-            isPlayingAlarm = true;
-        }
-    }
+
 
     void stopAlarm() {
         if (isPlayingAlarm) {
             mediaPlayer.setLooping(false);
             mediaPlayer.stop();
             mediaPlayer.release();
-            mediaPlayer = MediaPlayer.create(context, R.raw.alarm_sound_1);
+            mediaPlayer = MediaPlayer.create(context, R.raw.alarm_sound_2);
             isPlayingAlarm = false;
-            stopAlarmButton.setVisibility(View.GONE);
             NotificationManager manager = context.getSystemService(NotificationManager.class);
             manager.cancel(NOTIFICATION_ID);
         }
