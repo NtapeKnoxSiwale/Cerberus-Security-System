@@ -1,4 +1,4 @@
-package dev.knox.cerberus;
+package dev.knox.cerberus.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -31,61 +31,48 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import dev.knox.cerberus.MainActivity;
+import dev.knox.cerberus.R;
 import dev.knox.cerberus.databinding.ActivityAuthBinding;
 
 public class AuthActivity extends AppCompatActivity {
-
     private static final String TAG = "AuthActivity";
     private static final String INVALID_PASSWORD_ERROR = "Invalid password";
     private static final String AUTHENTICATION_FAILED_ERROR = "Authentication failed.";
-
     private EditText emailLoginEditText, passwordLoginEditText, emailRegisterEditText, passwordRegisterEditText, firstNameEditText, lastNameEditText, businessNameEditText, phoneNumberEditText;
     private FirebaseAuth mAuth;
-
     private ProgressBar progressBar;
-
     private View overlayView;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dev.knox.cerberus.databinding.ActivityAuthBinding binding = ActivityAuthBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         // Inflate the overlay layout and hide it by default
         overlayView = LayoutInflater.from(this).inflate(R.layout.overlay_layout, null);
         overlayView.setVisibility(View.GONE);
-
         // Add the overlay view to the activity's layout
         ViewGroup rootView = findViewById(android.R.id.content);
         rootView.addView(overlayView);
-
         progressBar = findViewById(R.id.progressBar);
-
         mAuth = FirebaseAuth.getInstance();
-
         // EditTexts
         emailLoginEditText = findViewById(R.id.emailLoginEditText);
         passwordLoginEditText = findViewById(R.id.passwordLoginEditText);
         emailRegisterEditText = findViewById(R.id.emailRegisterEditText);
         passwordRegisterEditText = findViewById(R.id.passwordRegisterEditText);
-
         firstNameEditText = findViewById(R.id.firstNameEditText);
         lastNameEditText = findViewById(R.id.lastNameEditText);
         businessNameEditText = findViewById(R.id.businessNameEditText);
         phoneNumberEditText = findViewById(R.id.phoneNumberEditText);
-
         // Buttons
         Button forgotPassword = findViewById(R.id.forgotPasswordButton);
         Button login = findViewById(R.id.loginButton);
         Button register = findViewById(R.id.registerButton);
-
         ViewFlipper viewFlipper = findViewById(R.id.authViewFlipper);
         register.setOnClickListener(v -> viewFlipper.setDisplayedChild(1));
-
         forgotPassword.setEnabled(false); // Disable button by default
-
         // Enable button when the user starts typing in the email field
         emailLoginEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -101,23 +88,18 @@ public class AuthActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
             }
         });
-
         forgotPassword.setOnClickListener(v -> {
             String email = emailLoginEditText.getText().toString().trim();
-
             if (TextUtils.isEmpty(email)) {
                 emailLoginEditText.setError(getString(R.string.error_empty_email));
                 emailLoginEditText.requestFocus();
                 return;
             }
-
             // Show loading indicator while sending the password reset email
             progressBar.setVisibility(View.VISIBLE);
             showOverlay();
-
             mAuth.sendPasswordResetEmail(email)
                     .addOnCompleteListener(task -> {
-
                         if (task.isSuccessful()) {
                             // Hide the loading indicator
                             progressBar.setVisibility(View.GONE);
@@ -135,43 +117,32 @@ public class AuthActivity extends AppCompatActivity {
                         }
                     });
         });
-
-
         // Set TextChangedListener for password input
         passwordLoginEditText.addTextChangedListener(getPasswordWatcher());
         setMaxLength(passwordLoginEditText);
-
-
         login.setOnClickListener(v -> {
             String email = emailLoginEditText.getText().toString().trim();
             String password = passwordLoginEditText.getText().toString();
-
             validateEmailAndPassword(email, password);
-
             if (isValidEmail(email)) {
                 emailLoginEditText.setError("Please enter a valid email address");
                 emailLoginEditText.requestFocus();
                 return;
             }
-
             if (isValidPassword(password)) {
                 passwordLoginEditText.setError("Password must be at least 6 characters long");
                 passwordLoginEditText.requestFocus();
                 return;
             }
-
             // Show progress bar while signing in
             progressBar.setVisibility(View.VISIBLE);
             showOverlay();
-
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
-
                         if (task.isSuccessful()) {
                             // Hide progress bar when sign-in is complete
                             progressBar.setVisibility(View.INVISIBLE);
                             hideOverlay();
-
                             // User has signed in successfully, navigate to the main activity
                             Intent intent = new Intent(this, MainActivity.class);
                             startActivity(intent);
@@ -186,38 +157,28 @@ public class AuthActivity extends AppCompatActivity {
                     })
                     .addOnFailureListener(this, this::onSignInFailure);
         });
-
-
         passwordRegisterEditText.addTextChangedListener(getPasswordWatcher());
         setMaxLength(passwordRegisterEditText);
-
-
         Button next = findViewById(R.id.nextButton);
         next.setOnClickListener(v -> {
             String email = emailRegisterEditText.getText().toString().trim();
             String password = passwordRegisterEditText.getText().toString().trim();
-
             validateEmailAndPassword(email, password);
-
             if (isValidEmail(email)) {
                 emailRegisterEditText.setError("Please enter a valid email address");
                 emailRegisterEditText.requestFocus();
                 return;
             }
-
             if (isValidPassword(password)) {
                 passwordRegisterEditText.setError("Password must be at least 6 characters long");
                 passwordRegisterEditText.requestFocus();
                 return;
             }
-
             // Show loading indicator while sending the password reset email
             progressBar.setVisibility(View.VISIBLE);
             showOverlay();
-
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
-
                         if (task.isSuccessful()) {
                             // Hide progress bar when sign-in is complete
                             progressBar.setVisibility(View.INVISIBLE);
@@ -227,15 +188,12 @@ public class AuthActivity extends AppCompatActivity {
                             assert user != null;
                             String uid = user.getUid();
                             String userEmail = user.getEmail();
-
                             Calendar calendar = Calendar.getInstance();
                             String year = String.valueOf(calendar.get(Calendar.YEAR));
                             String dayOfYear = String.valueOf(calendar.get(Calendar.DAY_OF_YEAR));
                             String css = "CSS"; // or any other string
                             String lastFourDigits = uid.substring(uid.length() - 4);
-
                             String productKey = lastFourDigits + year + dayOfYear + css;
-
                             DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
                             usersRef.child(uid).child("email").setValue(userEmail)
                                     .addOnCompleteListener(task1 -> {
@@ -279,13 +237,10 @@ public class AuthActivity extends AppCompatActivity {
                             Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                         }
                     });
-
         });
-
         Button saveButton = findViewById(R.id.saveButton);
         // Disable button initially
         saveButton.setEnabled(false);
-
         final TextWatcher textWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -310,10 +265,7 @@ public class AuthActivity extends AppCompatActivity {
         lastNameEditText.addTextChangedListener(textWatcher);
         businessNameEditText.addTextChangedListener(textWatcher);
         phoneNumberEditText.addTextChangedListener(textWatcher);
-
-        saveButton.setOnClickListener(view ->
-                saveData()
-        );
+        saveButton.setOnClickListener(view -> saveData());
     }
 
     private TextWatcher getPasswordWatcher() {
@@ -342,53 +294,42 @@ public class AuthActivity extends AppCompatActivity {
             emailRegisterEditText.requestFocus();
             return;
         }
-
         if (TextUtils.isEmpty(password)) {
             passwordRegisterEditText.setError("Please enter your password");
             passwordRegisterEditText.requestFocus();
             return;
         }
-
         if (password.length() < 6) {
             passwordRegisterEditText.setError("Password must not be least 6 characters long");
             passwordRegisterEditText.requestFocus();
         }
-
     }
-
 
     private void saveData() {
         String firstName = firstNameEditText.getText().toString().trim();
         String lastName = lastNameEditText.getText().toString().trim();
         String businessName = businessNameEditText.getText().toString().trim();
         String phoneNumber = phoneNumberEditText.getText().toString().trim();
-
         if (firstName.isEmpty() && lastName.isEmpty() && businessName.isEmpty() && phoneNumber.isEmpty()) {
             Toast.makeText(this, "Please fill in at least one field", Toast.LENGTH_SHORT).show();
             return;
         }
-
         FirebaseUser user = mAuth.getCurrentUser();
         assert user != null;
         String uid = user.getUid();
-
         Map<String, Object> data = new HashMap<>();
         data.put("first_name", firstName);
         data.put("last_name", lastName);
         data.put("business_name", businessName);
         data.put("phone_number", phoneNumber);
-
         // Show the progress bar
         progressBar.setVisibility(View.VISIBLE);
         showOverlay();
-
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
         usersRef.child(uid).setValue(data)
                 .addOnSuccessListener(aVoid -> {
-
                     progressBar.setVisibility(View.GONE);
                     hideOverlay();
-
                     Log.d(TAG, "Information saved successfully");
                     Toast.makeText(this, "Information saved successfully", Toast.LENGTH_SHORT).show();
                     // Data saved successfully, open MainActivity
@@ -399,11 +340,9 @@ public class AuthActivity extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     hideOverlay();
                     hideOverlay();
-                    Toast.makeText(AuthActivity.this, "Failed to save user data.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Failed to save user data.", Toast.LENGTH_SHORT).show();
                 });
     }
-
-
 
     private void onSignInFailure(Exception exception) {
         if (exception instanceof FirebaseAuthInvalidUserException) {
@@ -462,6 +401,4 @@ public class AuthActivity extends AppCompatActivity {
         overlayView.setVisibility(View.GONE);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
-
 }
-

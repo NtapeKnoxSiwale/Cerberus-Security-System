@@ -35,7 +35,6 @@ public class AlarmSystem {
         isPlayingAlarm = false;
     }
 
-
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
@@ -50,7 +49,6 @@ public class AlarmSystem {
             manager.createNotificationChannel(channel);
         }
     }
-
 
     public void checkWeightAndNotify(String roomName, double weight) {
         // User set trigger 1: notification
@@ -106,8 +104,6 @@ public class AlarmSystem {
         }
     }
 
-
-
     void stopAlarm() {
         if (isPlayingAlarm) {
             mediaPlayer.setLooping(false);
@@ -119,5 +115,4 @@ public class AlarmSystem {
             manager.cancel(NOTIFICATION_ID);
         }
     }
-
 }

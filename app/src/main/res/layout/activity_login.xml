@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:text="@string/login"
             android:textAlignment="center"
-            android:textSize="32sp"
+            android:textSize="38sp"
             android:textStyle="bold" />
 
         <com.google.android.material.textfield.TextInputLayout

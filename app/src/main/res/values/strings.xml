@@ -1,5 +1,4 @@
 <resources>
-
     <string name="notification_channel_description">Notification for weight alarms</string>
     <string name="notification_title">Weight Alarm</string>
     <string name="notification_message">Hi user, we have detected a weight of %.2f kg in %s</string>
@@ -46,5 +45,11 @@
     <string name="password_reset_email_failed_message">Password reset email failed message.</string>
     <string name="error_empty_email">Please enter your email</string>
     <string name="loading_message">Loading</string>
+    <string name="title_activity_main2">MainActivity2</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="logout">Logout</string>
+    <string name="more">More</string>
 
 </resources>
