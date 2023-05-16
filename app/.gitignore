@@ -1,1 +1,3 @@
 /build!/google-services.json
+/src/main/java/dev/knox/cerberus/ui/notifications/NotificationsFragment.java
+/src/main/java/dev/knox/cerberus/ui/notifications/NotificationsViewModel.java
