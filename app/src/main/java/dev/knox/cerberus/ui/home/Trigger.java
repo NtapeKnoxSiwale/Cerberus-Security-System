@@ -70,4 +70,5 @@ public class Trigger {
     public void setAlertType(String alertType) {
         this.alertType = alertType;
     }
+
 }

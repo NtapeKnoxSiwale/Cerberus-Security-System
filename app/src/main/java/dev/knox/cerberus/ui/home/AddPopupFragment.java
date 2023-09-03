@@ -1,5 +1,7 @@
 package dev.knox.cerberus.ui.home;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -21,10 +23,10 @@ import androidx.fragment.app.DialogFragment;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.ValueEventListener;
 
 import dev.knox.cerberus.R;
@@ -175,8 +177,8 @@ public class AddPopupFragment extends DialogFragment {
         if (currentUser != null) {
             String currentUserId = currentUser.getUid();
 
-            // Create a reference to the "triggers" node for the current user
-            DatabaseReference userTriggersRef = usersRef.child("triggers");
+            // Create a reference to the room's triggers for the current user in Firebase
+            DatabaseReference roomTriggersRef = usersRef.child(selectedRoom);
 
             // Parse max and min to integers, and handle any parsing errors
             int maxInt, minInt;
@@ -188,28 +190,30 @@ public class AddPopupFragment extends DialogFragment {
                 return;
             }
 
-            // Query the database to check the number of existing triggers for the current user
-            userTriggersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            // Query the database to check the number of existing triggers for the selected room
+            roomTriggersRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     int numberOfTriggers = (int) dataSnapshot.getChildrenCount();
                     if (numberOfTriggers < 3) {
-                        // If the user has fewer than 3 triggers, create a new one
+                        // If the room has fewer than 3 triggers, create a new one
                         int nextTriggerNumber = numberOfTriggers + 1;
                         String newTriggerKey = "trigger" + nextTriggerNumber;
-                        DatabaseReference newTriggerRef = userTriggersRef.child(newTriggerKey);
+                        DatabaseReference newTriggerRef = roomTriggersRef.child(newTriggerKey);
                         Trigger newTrigger = new Trigger(newTriggerKey, selectedRoom, String.valueOf(maxInt), String.valueOf(minInt), selectedNotificationType, selectedAlertType);
+
+                        // Save to Firebase under the selected room
                         newTriggerRef.setValue(newTrigger);
 
-                        // Now, you have successfully added the new trigger with the next trigger number for the current user
+                        // Save to Local Cache
+                        saveTriggerToLocalCache(newTrigger);
+
+                        // Now, you have successfully added the new trigger with the next trigger number for the current user and room
                         Toast.makeText(getContext(), "Trigger added successfully: " + newTriggerKey, Toast.LENGTH_SHORT).show();
                         dismiss(); // Close the dialog
-
-                        // Now, you have successfully added the new trigger with the next trigger number for the current user
-                        dismiss(); // Close the dialog
                     } else {
-                        // The user already has 3 triggers, show a message indicating the limit
-                        Toast.makeText(getContext(), "Maximum number of triggers (3) reached.", Toast.LENGTH_SHORT).show();
+                        // The selected room already has 3 triggers, show a message indicating the limit
+                        Toast.makeText(getContext(), "Maximum number of triggers (3) reached for the selected room.", Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -252,5 +256,24 @@ public class AddPopupFragment extends DialogFragment {
         boolean enableButtons = !max.isEmpty() && !min.isEmpty() && !selectedRoom.isEmpty() && isNotificationTypeSelected && isAlertTypeSelected;
         rootView.findViewById(R.id.saveButton).setEnabled(enableButtons);
         rootView.findViewById(R.id.testButton).setEnabled(enableButtons);
+    }
+
+    // Method to save trigger data to local cache
+    private void saveTriggerToLocalCache(Trigger trigger) {
+        // Get the SharedPreferences instance
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("TriggerData", Context.MODE_PRIVATE);
+
+        // Create an editor to modify SharedPreferences
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        // Store the trigger data as key-value pairs
+        editor.putString("room", trigger.getRoomNumber());
+        editor.putString("max", trigger.getMaxInput());
+        editor.putString("min", trigger.getMinInput());
+        editor.putString("notificationType", trigger.getNotificationType());
+        editor.putString("alertType", trigger.getAlertType());
+
+        // Apply changes
+        editor.apply();
     }
 }
