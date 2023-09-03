@@ -206,7 +206,7 @@ public class AuthActivity extends AppCompatActivity {
                                     .addOnCompleteListener(task2 -> {
                                         if (task2.isSuccessful()) {
                                             Log.d(TAG, "User email saved successfully");
-                                            Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show();
+                                            //Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show();
                                             // Switch to the new view after the user is created
                                             viewFlipper.setDisplayedChild(2);
                                         } else {
@@ -217,7 +217,7 @@ public class AuthActivity extends AppCompatActivity {
                                     .addOnCompleteListener(task3 -> {
                                         if (task.isSuccessful()) {
                                             Log.d(TAG, "Product key saved successfully");
-                                            Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show();
+                                            //Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show();
 
                                             EditText productKeyEditTextView = findViewById(R.id.productKeyEditText);
                                             productKeyEditTextView.setText(productKey);
@@ -266,6 +266,56 @@ public class AuthActivity extends AppCompatActivity {
         businessNameEditText.addTextChangedListener(textWatcher);
         phoneNumberEditText.addTextChangedListener(textWatcher);
         saveButton.setOnClickListener(view -> saveData());
+
+//        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+//        FirebaseUser currentUser = mAuth.getCurrentUser();
+//
+//        if (currentUser != null) {
+//            // User is already logged in, check if their data exists in the database
+//            DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
+//            usersRef.child(currentUser.getUid()).get().addOnCompleteListener(task -> {
+//                if (task.isSuccessful()) {
+//                    if (task.getResult().exists()) {
+//                        // User exists in the database, navigate to MainActivity
+//                        openMainActivity();
+//                    } else {
+//                        // User data doesn't exist in the database, display an error message and log the user out
+//                        //String errorMessage = "User not available. Please log in or sign up.";
+//                        // Display the errorMessage to the user using your preferred method (e.g., toast, dialog)
+//                        // For example, using a Toast:
+//                        //Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+//
+//                        // Log the user out
+//                        mAuth.signOut();
+//                    }
+//                } else {
+//                    // Error occurred while fetching data from the database, handle the error here
+//                    // For example, display an error message to the user
+//                    String errorMessage = "Error: " + task.getException().getMessage();
+//                    // Display the errorMessage to the user using your preferred method (e.g., toast, dialog)
+//                    // For example, using a Toast:
+//                    Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+//                }
+//            });
+//        } else {
+//            // User is not logged in, display an error message and log the user out
+//            // Your error message could be shown in a dialog, a toast, or any other UI element
+//            String errorMessage = "User not available. Please log in or sign up.";
+//            // Display the errorMessage to the user using your preferred method (e.g., toast, dialog)
+//            // For example, using a Toast:
+//            Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+//
+//            // Log the user out
+//            mAuth.signOut();
+//        }
+
+        mAuth = FirebaseAuth.getInstance();
+
+        // Check if a user is already logged in
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            openMainActivity();
+        }
     }
 
     private TextWatcher getPasswordWatcher() {
@@ -310,6 +360,7 @@ public class AuthActivity extends AppCompatActivity {
         String lastName = lastNameEditText.getText().toString().trim();
         String businessName = businessNameEditText.getText().toString().trim();
         String phoneNumber = phoneNumberEditText.getText().toString().trim();
+        Integer roomNumber = 2;
         if (firstName.isEmpty() && lastName.isEmpty() && businessName.isEmpty() && phoneNumber.isEmpty()) {
             Toast.makeText(this, "Please fill in at least one field", Toast.LENGTH_SHORT).show();
             return;
@@ -322,6 +373,7 @@ public class AuthActivity extends AppCompatActivity {
         data.put("last_name", lastName);
         data.put("business_name", businessName);
         data.put("phone_number", phoneNumber);
+        data.put("rooms", roomNumber);
         // Show the progress bar
         progressBar.setVisibility(View.VISIBLE);
         showOverlay();
@@ -364,6 +416,7 @@ public class AuthActivity extends AppCompatActivity {
         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
+        finish();
     }
 
     private boolean isValidEmail(String email) {

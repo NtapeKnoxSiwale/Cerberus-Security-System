@@ -1,8 +1,8 @@
 package dev.knox.cerberus;
 
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.app.NotificationChannel;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Build;
@@ -51,11 +51,7 @@ public class AlarmSystem {
     }
 
     public void checkWeightAndNotify(String roomName, double weight) {
-        // User set trigger 1: notification
-        if (weight > 0 && weight <= 20) {
-            // Grey out the button and disable it
-            stopAlarmButton.setEnabled(false);
-
+        if (weight >= 0 && weight <= 20) {
             String message = context.getString(R.string.notification_message, weight, roomName);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.drawable.notification_icon)
@@ -65,23 +61,16 @@ public class AlarmSystem {
                     .setAutoCancel(true);
             NotificationManager manager = context.getSystemService(NotificationManager.class);
             manager.notify(NOTIFICATION_ID, builder.build());
-            vibrate();
-        }
-        // user set trigger 2: notification + sound alarm
-        // password promote
-        else if (weight > 20 && weight < 50) {
+        } else if (weight > 20 && weight <= 40) {
+            soundAlarm();
             stopAlarmButton.setEnabled(true);
-            stopAlarm();
-        } else if (isPlayingAlarm) {
-            stopAlarmButton.setEnabled(true);
-            stopAlarm();
-        }
-
-        // Override AlertSystem: promote password
-        else if (weight >= 50) {
+        } else if (weight > 40) {
             soundAlarm();
             vibrate();
             stopAlarmButton.setEnabled(true);
+        } else if (isPlayingAlarm) {
+            stopAlarmButton.setEnabled(true);
+            stopAlarm();
         }
     }
 
@@ -104,7 +93,7 @@ public class AlarmSystem {
         }
     }
 
-    void stopAlarm() {
+    public void stopAlarm() {
         if (isPlayingAlarm) {
             mediaPlayer.setLooping(false);
             mediaPlayer.stop();

@@ -1,0 +1,174 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp">
+
+        <!-- Room Selection Spinner -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add Trigger"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp"
+            />
+
+        <Spinner
+            android:id="@+id/roomSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="8dp"
+            android:layout_marginTop="8dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:textAlignment="center"
+            android:textColor="@android:color/black"
+            android:textSize="18sp" />
+
+        <!-- Number Inputs -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <!-- First Number Input -->
+            <EditText
+                android:id="@+id/maxInput"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:hint="@string/Mini"
+                android:textAlignment="center"
+                android:inputType="number"
+                android:layout_marginEnd="4dp"/>
+
+            <!-- Text "to" -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="to"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"/>
+
+            <!-- Second Number Input -->
+            <EditText
+                android:id="@+id/minInput"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:textAlignment="center"
+                android:hint="@string/max"
+                android:inputType="number"
+                android:layout_marginStart="4dp"/>
+
+        </LinearLayout>
+
+        <!-- ... (previous XML layout) ... -->
+
+        <!-- Text Label for Radio Buttons -->
+        <!-- Text Label for Alert Type -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Alert Type"
+            android:textSize="16sp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Radio Group for Alert Type -->
+        <RadioGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/alertTypeRadioGroup"
+            android:paddingBottom="8dp">
+
+            <RadioButton
+                android:id="@+id/alertTypeRadioButton1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sound" />
+
+            <RadioButton
+                android:id="@+id/alertTypeRadioButton2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vibration" />
+
+            <RadioButton
+                android:id="@+id/alertTypeRadioButton3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sound and Vibration" />
+
+        </RadioGroup>
+
+        <!-- Text Label for Another Option -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Notification Style"
+            android:textSize="16sp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Radio Group for Another Option -->
+        <RadioGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/notificationTypeRadioGroup"
+            android:gravity="center_horizontal"
+            android:paddingBottom="10dp">
+
+            <RadioButton
+                android:id="@+id/notificationTypeRadioButton1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pop-up"
+                android:paddingEnd="40dp" />
+
+            <RadioButton
+                android:id="@+id/notificationTypeRadioButton2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Full-Screen" />
+
+        </RadioGroup>
+
+        <!-- Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/testButton"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:text="Test"
+                android:layout_marginEnd="80dp"/>
+
+            <Button
+                android:id="@+id/saveButton"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:text="Save"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
