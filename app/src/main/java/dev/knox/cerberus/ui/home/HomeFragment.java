@@ -1,10 +1,12 @@
 package dev.knox.cerberus.ui.home;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,8 +35,7 @@ public class HomeFragment extends Fragment {
     private TriggerAdapter adapter;
     private List<Trigger> cachedTriggerList; // Store cached data here
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -51,12 +52,17 @@ public class HomeFragment extends Fragment {
 
         // Set up RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new TriggerAdapter(new ArrayList<>());
+        adapter = new TriggerAdapter(new ArrayList<>(), this);
         recyclerView.setAdapter(adapter);
 
         addButton.setOnClickListener(v -> {
-            AddPopupFragment popupFragment = new AddPopupFragment();
-            popupFragment.show(getParentFragmentManager(), "add_popup_fragment");
+            if (isMaxTriggersReached()) {
+                addButton.setEnabled(false);
+                Toast.makeText(getContext(), "Maximum number of triggers reached for the selected room.", Toast.LENGTH_SHORT).show();
+            } else {
+                AddPopupFragment popupFragment = new AddPopupFragment();
+                popupFragment.show(getParentFragmentManager(), "add_popup_fragment");
+            }
         });
 
         // Read data from Firebase and update the adapter
@@ -79,6 +85,11 @@ public class HomeFragment extends Fragment {
                         DataSnapshot room1Snapshot = dataSnapshot.child("Room 1");
                         for (DataSnapshot triggerSnapshot : room1Snapshot.getChildren()) {
                             Trigger trigger = triggerSnapshot.getValue(Trigger.class);
+
+                            // Retrieve and set the trigger name from Firebase
+                            String triggerName = triggerSnapshot.child("triggerName").getValue(String.class);
+                            trigger.setTriggerName(triggerName);
+
                             triggerList.add(trigger);
                         }
                     }
@@ -88,12 +99,17 @@ public class HomeFragment extends Fragment {
                         DataSnapshot room2Snapshot = dataSnapshot.child("Room 2");
                         for (DataSnapshot triggerSnapshot : room2Snapshot.getChildren()) {
                             Trigger trigger = triggerSnapshot.getValue(Trigger.class);
+
+                            // Retrieve and set the trigger name from Firebase
+                            String triggerName = triggerSnapshot.child("triggerName").getValue(String.class);
+                            trigger.setTriggerName(triggerName);
+
                             triggerList.add(trigger);
                         }
                     }
 
                     // Update the adapter with the new data
-                    adapter.setTriggerList(triggerList);
+                    adapter.updateTriggerList(triggerList);
 
                     // Store the data in the cache
                     cachedTriggerList = triggerList;
@@ -107,9 +123,63 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    // Add this method to check if the maximum number of triggers is reached for the selected room
+    private boolean isMaxTriggersReached() {
+        if (cachedTriggerList != null) {
+            // Determine the maximum limit (e.g., 3 triggers per room)
+            int maxLimitPerRoom = 3;
+
+            // Count the triggers in the selected room
+            String selectedRoom = getSelectedRoom(); // Implement this method to get the selected room
+            int triggersInSelectedRoom = countTriggersInRoom(selectedRoom);
+
+            // Check if the maximum limit is reached
+            return triggersInSelectedRoom >= maxLimitPerRoom;
+        }
+        return false;
+    }
+
+    // Implement this method to get the selected room from your UI
+    private String getSelectedRoom() {
+        // Replace this with the logic to get the selected room from your UI
+        return "Room 1"; // Example: Replace with your actual logic
+    }
+
+    // Add this method to count triggers in the selected room
+    private int countTriggersInRoom(String roomName) {
+        int count = 0;
+        if (cachedTriggerList != null) {
+            for (Trigger trigger : cachedTriggerList) {
+                if (trigger.getRoomNumber().equals(roomName)) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    // Implement the onTriggerCardClick method to open the EditTriggerFragment
+    public void onTriggerCardClick(Trigger trigger) {
+        // Log a message to confirm that the method is being called
+        Log.d("HomeFragment", "Trigger card clicked");
+
+        // Create a bundle to pass trigger data to the EditTriggerFragment
+        Bundle args = new Bundle();
+        args.putString("max", trigger.getMaxInput());
+        args.putString("min", trigger.getMinInput());
+        args.putString("notificationType", trigger.getNotificationType());
+        args.putString("alertType", trigger.getAlertType());
+
+        EditTriggerFragment editTriggerFragment = new EditTriggerFragment();
+        editTriggerFragment.setArguments(args);
+
+        // Show the EditTriggerFragment
+        editTriggerFragment.show(getParentFragmentManager(), "edit_trigger_fragment");
     }
 }

@@ -54,11 +54,13 @@
     <string name="help">get help</string>
     <string name="name">Name:</string>
     <string name="edit">edit</string>
-    <string name="add">add</string>
-    <string name="enter_number_2">Enter Number 2</string>
-    <string name="enter_number_1">Enter Number 1</string>
+    <string name="add">add trigger</string>
     <string name="Mini">mini</string>
     <string name="max">max</string>
+    <string name="edit_trigger">Edit Trigger</string>
+    <string name="alert_type">Alert Type</string>
+    <string name="sound">Sound</string>
+    <string name="vibration">Vibration</string>
 
     <string-array name="room_options">
         <item>Room 1</item>

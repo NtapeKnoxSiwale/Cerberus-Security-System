@@ -1,74 +1,104 @@
 <!-- res/layout/trigger_item.xml -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:layout_marginBottom="8dp">
+    android:layout_margin="8dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="4dp"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:outlineAmbientShadowColor="@color/black">
 
-    <!-- Trigger Name -->
-    <TextView
-        android:id="@+id/triggerNameTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Trigger Name"
-        android:textSize="18sp"
-        android:textStyle="bold" />
-
-    <!-- Room -->
-    <TextView
-        android:id="@+id/roomTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Room: Living Room"
-        android:textColor="#666666"
-        android:textSize="16sp" />
-
-    <!-- Max and Min -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:padding="16dp">
 
+        <!-- Trigger Name -->
         <TextView
-            android:id="@+id/maxTextView"
+            android:id="@+id/triggerNameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Max:"
-            android:textColor="#333333"
-            android:textSize="16sp" />
+            android:text="Trigger Name"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
+        <!-- Room -->
         <TextView
-            android:id="@+id/minTextView"
+            android:id="@+id/roomTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Min:"
-            android:textColor="#333333"
+            android:text="Room: Living Room"
+            android:textColor="#666666"
             android:textSize="16sp" />
+
+        <!-- Max and Min -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/minTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Min:"
+                android:textColor="#333333"
+                android:paddingEnd="10dp"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" - "
+                android:paddingEnd="10dp"
+                android:textColor="#333333"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/maxTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Max:"
+                android:textColor="#333333"
+                android:textSize="16sp"/>
+        </LinearLayout>
+
+        <!-- Notification Type and Alert Type -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/alertTypeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Alert Type:"
+                android:textColor="#333333"
+                android:textSize="12sp"
+                android:paddingEnd="10dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="|"
+                android:paddingEnd="10dp"/>
+
+            <TextView
+                android:id="@+id/notificationTypeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Notification Type:"
+                android:textColor="#333333"
+                android:textSize="12sp" />
+        </LinearLayout>
     </LinearLayout>
-
-    <!-- Notification Type and Alert Type -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/notificationTypeTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Notification Type:"
-            android:textColor="#333333"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/alertTypeTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Alert Type:"
-            android:textColor="#333333"
-            android:textSize="16sp" />
-    </LinearLayout>
-</LinearLayout>
+</androidx.cardview.widget.CardView>

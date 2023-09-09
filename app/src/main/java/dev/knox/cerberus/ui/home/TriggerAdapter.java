@@ -15,17 +15,24 @@ import dev.knox.cerberus.R;
 public class TriggerAdapter extends RecyclerView.Adapter<TriggerAdapter.TriggerViewHolder> {
 
     private List<Trigger> triggerList;
+    private HomeFragment homeFragment;
 
-    public TriggerAdapter(List<Trigger> triggerList) {
+    public TriggerAdapter(List<Trigger> triggerList, HomeFragment homeFragment) {
         this.triggerList = triggerList;
+        this.homeFragment = homeFragment;
+    }
+
+    public void updateTriggerList(List<Trigger> updatedList) {
+        triggerList.clear();
+        triggerList.addAll(updatedList);
+        notifyDataSetChanged();
     }
 
     @NonNull
     @Override
     public TriggerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.trigger_item, parent, false);
-        return new TriggerViewHolder(itemView);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.trigger_item, parent, false);
+        return new TriggerViewHolder(view);
     }
 
     @Override
@@ -34,47 +41,50 @@ public class TriggerAdapter extends RecyclerView.Adapter<TriggerAdapter.TriggerV
         holder.bind(trigger);
     }
 
+    public void setTriggerList(List<Trigger>triggerList){
+        this.triggerList = triggerList;
+        // Notify the adapter that the data has changed
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() {
         return triggerList.size();
     }
 
-    public void setTriggerList(List<Trigger> triggerList) {
-        this.triggerList = triggerList;
-        notifyDataSetChanged(); // Notify the adapter that the data has changed
-    }
-
-    // Add a method to set cached trigger data
-    public void setCachedTriggerList(List<Trigger> cachedTriggerList) {
-        this.triggerList = cachedTriggerList;
-        notifyDataSetChanged(); // Notify the adapter that the data has changed
-    }
-
     public class TriggerViewHolder extends RecyclerView.ViewHolder {
-        private TextView triggerNameTextView;
-        private TextView roomNumberTextView;
-        private TextView maxInputTextView;
-        private TextView minInputTextView;
-        private TextView notificationTypeTextView;
-        private TextView alertTypeTextView;
+        private final TextView triggerNameTextView;
+        private final TextView roomNumberTextView;
+        private final TextView maxTextView;
+        private final TextView minTextView;
+        private final TextView notificationTypeTextView;
+        private final TextView alertTypeTextView;
 
         public TriggerViewHolder(@NonNull View itemView) {
             super(itemView);
             triggerNameTextView = itemView.findViewById(R.id.triggerNameTextView);
             roomNumberTextView = itemView.findViewById(R.id.roomTextView);
-            maxInputTextView = itemView.findViewById(R.id.maxTextView);
-            minInputTextView = itemView.findViewById(R.id.minTextView);
+            maxTextView = itemView.findViewById(R.id.maxTextView);
+            minTextView = itemView.findViewById(R.id.minTextView);
             notificationTypeTextView = itemView.findViewById(R.id.notificationTypeTextView);
             alertTypeTextView = itemView.findViewById(R.id.alertTypeTextView);
+
+            itemView.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    Trigger trigger = triggerList.get(position);
+                    homeFragment.onTriggerCardClick(trigger);
+                }
+            });
         }
 
         public void bind(Trigger trigger) {
             triggerNameTextView.setText("Trigger Name: " + trigger.getTriggerName());
-            roomNumberTextView.setText("Room Number: " + trigger.getRoomNumber());
-            maxInputTextView.setText("Max Input: " + trigger.getMaxInput());
-            minInputTextView.setText("Min Input: " + trigger.getMinInput());
-            notificationTypeTextView.setText("Notification Type: " + trigger.getNotificationType());
-            alertTypeTextView.setText("Alert Type: " + trigger.getAlertType());
+            roomNumberTextView.setText("Room: " + trigger.getRoomNumber());
+            maxTextView.setText("Max Input: " + trigger.getMaxInput());
+            minTextView.setText("Min Input: " + trigger.getMinInput());
+            notificationTypeTextView.setText("Notification: " + trigger.getNotificationType());
+            alertTypeTextView.setText("Alert: " + trigger.getAlertType());
         }
     }
 }

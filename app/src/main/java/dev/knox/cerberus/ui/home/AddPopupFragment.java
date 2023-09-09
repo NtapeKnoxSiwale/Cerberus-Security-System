@@ -199,10 +199,12 @@ public class AddPopupFragment extends DialogFragment {
                         // If the room has fewer than 3 triggers, create a new one
                         int nextTriggerNumber = numberOfTriggers + 1;
                         String newTriggerKey = "trigger" + nextTriggerNumber;
-                        DatabaseReference newTriggerRef = roomTriggersRef.child(newTriggerKey);
+
+                        // Create a new Trigger object
                         Trigger newTrigger = new Trigger(newTriggerKey, selectedRoom, String.valueOf(maxInt), String.valueOf(minInt), selectedNotificationType, selectedAlertType);
 
                         // Save to Firebase under the selected room
+                        DatabaseReference newTriggerRef = roomTriggersRef.child(newTriggerKey);
                         newTriggerRef.setValue(newTrigger);
 
                         // Save to Local Cache
