@@ -1,4 +1,4 @@
-package dev.knox.cerberus;
+package dev.knox.cerberus.ui.dashboard;
 
 import android.app.NotificationManager;
 import android.content.Context;
@@ -11,6 +11,8 @@ import android.os.Vibrator;
 import android.widget.Button;
 
 import androidx.core.app.NotificationCompat;
+
+import dev.knox.cerberus.R;
 
 public class AlarmSystem {
 

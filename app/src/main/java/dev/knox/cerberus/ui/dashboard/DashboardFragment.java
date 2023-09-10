@@ -20,7 +20,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.DecimalFormat;
 
-import dev.knox.cerberus.AlarmSystem;
 import dev.knox.cerberus.R;
 
 public class DashboardFragment extends Fragment {

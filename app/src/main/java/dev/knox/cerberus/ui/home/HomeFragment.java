@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -56,13 +55,8 @@ public class HomeFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         addButton.setOnClickListener(v -> {
-            if (isMaxTriggersReached()) {
-                addButton.setEnabled(false);
-                Toast.makeText(getContext(), "Maximum number of triggers reached for the selected room.", Toast.LENGTH_SHORT).show();
-            } else {
-                AddPopupFragment popupFragment = new AddPopupFragment();
-                popupFragment.show(getParentFragmentManager(), "add_popup_fragment");
-            }
+            AddPopupFragment popupFragment = new AddPopupFragment();
+            popupFragment.show(getParentFragmentManager(), "add_popup_fragment");
         });
 
         // Read data from Firebase and update the adapter
@@ -123,41 +117,6 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    // Add this method to check if the maximum number of triggers is reached for the selected room
-    private boolean isMaxTriggersReached() {
-        if (cachedTriggerList != null) {
-            // Determine the maximum limit (e.g., 3 triggers per room)
-            int maxLimitPerRoom = 3;
-
-            // Count the triggers in the selected room
-            String selectedRoom = getSelectedRoom(); // Implement this method to get the selected room
-            int triggersInSelectedRoom = countTriggersInRoom(selectedRoom);
-
-            // Check if the maximum limit is reached
-            return triggersInSelectedRoom >= maxLimitPerRoom;
-        }
-        return false;
-    }
-
-    // Implement this method to get the selected room from your UI
-    private String getSelectedRoom() {
-        // Replace this with the logic to get the selected room from your UI
-        return "Room 1"; // Example: Replace with your actual logic
-    }
-
-    // Add this method to count triggers in the selected room
-    private int countTriggersInRoom(String roomName) {
-        int count = 0;
-        if (cachedTriggerList != null) {
-            for (Trigger trigger : cachedTriggerList) {
-                if (trigger.getRoomNumber().equals(roomName)) {
-                    count++;
-                }
-            }
-        }
-        return count;
-    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -175,6 +134,8 @@ public class HomeFragment extends Fragment {
         args.putString("min", trigger.getMinInput());
         args.putString("notificationType", trigger.getNotificationType());
         args.putString("alertType", trigger.getAlertType());
+        args.putString("triggerNode", trigger.getTriggerName());
+        args.putString("triggerId", trigger.getRoomNumber());
 
         EditTriggerFragment editTriggerFragment = new EditTriggerFragment();
         editTriggerFragment.setArguments(args);

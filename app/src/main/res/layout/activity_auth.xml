@@ -10,7 +10,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context=".auth.AuthActivity">
+        tools:context=".AuthActivity">
 
         <FrameLayout
             android:layout_width="match_parent"

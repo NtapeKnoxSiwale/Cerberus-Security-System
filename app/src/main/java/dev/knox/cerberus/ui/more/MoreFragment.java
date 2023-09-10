@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment;
 import com.google.firebase.auth.FirebaseAuth;
 
 import dev.knox.cerberus.R;
-import dev.knox.cerberus.auth.AuthActivity;
+import dev.knox.cerberus.AuthActivity;
 
 public class MoreFragment extends Fragment {
     private View rootView;

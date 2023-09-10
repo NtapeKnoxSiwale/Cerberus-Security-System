@@ -12,16 +12,31 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Room Selection Spinner -->
-
-        <TextView
-            android:layout_width="match_parent"
+        <!-- Room Selection -->
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="16dp"
-            android:text="@string/edit_trigger"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/edit_trigger"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:paddingEnd="6dp" />
+
+            <TextView
+                android:id="@+id/triggerId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
 
         <!-- Number Inputs -->
         <LinearLayout
@@ -37,7 +52,7 @@
                 android:layout_height="50dp"
                 android:layout_marginEnd="4dp"
                 android:layout_weight="1"
-                android:hint="@string/Mini"
+                android:hint="@string/min"
                 android:inputType="number"
                 android:textAlignment="center" />
 
@@ -48,7 +63,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="4dp"
                 android:layout_marginEnd="4dp"
-                android:text="to" />
+                android:text="@string/to" />
 
             <!-- Second Number Input -->
             <EditText
@@ -63,10 +78,7 @@
 
         </LinearLayout>
 
-        <!-- ... (previous XML layout) ... -->
-
-        <!-- Text Label for Radio Buttons -->
-        <!-- Text Label for Alert Type -->
+        <!-- Alert Type -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -75,7 +87,6 @@
             android:text="@string/alert_type"
             android:textSize="16sp" />
 
-        <!-- Radio Group for Alert Type -->
         <RadioGroup
             android:id="@+id/editAlertTypeRadioGroup"
             android:layout_width="wrap_content"
@@ -99,20 +110,19 @@
                 android:id="@+id/editAlertTypeRadioButton3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sound and Vibration" />
+                android:text="@string/sound_and_vibration" />
 
         </RadioGroup>
 
-        <!-- Text Label for Another Option -->
+        <!-- Notification Type -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:text="Notification Style"
+            android:text="@string/notification_style"
             android:textSize="16sp" />
 
-        <!-- Radio Group for Another Option -->
         <RadioGroup
             android:id="@+id/editNotificationTypeRadioGroup"
             android:layout_width="wrap_content"
@@ -126,13 +136,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingEnd="40dp"
-                android:text="Pop-up" />
+                android:text="@string/pop_up" />
 
             <RadioButton
                 android:id="@+id/notificationTypeRadioButton2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Full-Screen" />
+                android:text="@string/full_screen" />
 
         </RadioGroup>
 
@@ -148,30 +158,30 @@
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
                 android:layout_marginEnd="80dp"
-                android:text="Delete" />
+                android:text="@string/delete" />
 
             <Button
                 android:id="@+id/saveEditButton"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
-                android:text="Save" />
+                android:text="@string/save" />
         </LinearLayout>
 
-        <!-- Buttons -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:paddingHorizontal="12dp">
+<!--        &lt;!&ndash; Activate Button &ndash;&gt;-->
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="4dp"-->
+<!--            android:gravity="center"-->
+<!--            android:orientation="horizontal"-->
+<!--            android:paddingHorizontal="12dp">-->
 
-            <Button
-                android:id="@+id/armButton"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:text="Activate" />
-        </LinearLayout>
+<!--            <Button-->
+<!--                android:id="@+id/activateButton"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="50dp"-->
+<!--                android:text="@string/activate" />-->
+<!--        </LinearLayout>-->
 
     </LinearLayout>
 </ScrollView>

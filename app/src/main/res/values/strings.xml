@@ -61,6 +61,15 @@
     <string name="alert_type">Alert Type</string>
     <string name="sound">Sound</string>
     <string name="vibration">Vibration</string>
+    <string name="activate">activate</string>
+    <string name="save">save</string>
+    <string name="delete">delete</string>
+    <string name="sound_and_vibration">Sound and Vibration</string>
+    <string name="notification_style">Notification Style</string>
+    <string name="pop_up">Pop-up</string>
+    <string name="full_screen">Full-screen</string>
+    <string name="to">to</string>
+    <string name="min">min</string>
 
     <string-array name="room_options">
         <item>Room 1</item>

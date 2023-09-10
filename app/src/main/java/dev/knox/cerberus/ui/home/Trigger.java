@@ -7,6 +7,8 @@ public class Trigger {
     private String minInput;
     private String notificationType;
     private String alertType;
+    private String triggerNode; // Add triggerNode property
+    private String triggerId; // Add triggerId property
 
     public Trigger() {
         // Default constructor required for Firebase
@@ -22,6 +24,21 @@ public class Trigger {
     }
 
     // Getters and setters for the fields
+    public String getTriggerNode() {
+        return triggerNode;
+    }
+
+    public void setTriggerNode(String triggerNode) {
+        this.triggerNode = triggerNode;
+    }
+
+    public String getTriggerId() {
+        return triggerId;
+    }
+
+    public void setTriggerId(String triggerId) {
+        this.triggerId = triggerId;
+    }
 
     public String getTriggerName() {
         return triggerName;
@@ -70,5 +87,4 @@ public class Trigger {
     public void setAlertType(String alertType) {
         this.alertType = alertType;
     }
-
 }

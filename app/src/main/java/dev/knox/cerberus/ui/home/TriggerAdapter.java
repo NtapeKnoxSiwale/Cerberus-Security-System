@@ -81,8 +81,8 @@ public class TriggerAdapter extends RecyclerView.Adapter<TriggerAdapter.TriggerV
         public void bind(Trigger trigger) {
             triggerNameTextView.setText("Trigger Name: " + trigger.getTriggerName());
             roomNumberTextView.setText("Room: " + trigger.getRoomNumber());
-            maxTextView.setText("Max Input: " + trigger.getMaxInput());
-            minTextView.setText("Min Input: " + trigger.getMinInput());
+            maxTextView.setText("Max Weight: " + trigger.getMaxInput());
+            minTextView.setText("Min Weight: " + trigger.getMinInput());
             notificationTypeTextView.setText("Notification: " + trigger.getNotificationType());
             alertTypeTextView.setText("Alert: " + trigger.getAlertType());
         }

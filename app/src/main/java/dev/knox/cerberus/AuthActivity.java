@@ -1,4 +1,4 @@
-package dev.knox.cerberus.auth;
+package dev.knox.cerberus;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -31,8 +31,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import dev.knox.cerberus.MainActivity;
-import dev.knox.cerberus.R;
 import dev.knox.cerberus.databinding.ActivityAuthBinding;
 
 public class AuthActivity extends AppCompatActivity {
