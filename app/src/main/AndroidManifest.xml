@@ -33,6 +33,11 @@
             android:exported="true">
         </activity>
 
+        <!-- Declare the FirebaseDataReadingService -->
+        <service
+            android:name=".ui.dashboard.WeightDataUpdateService"
+            android:exported="false" />
+
     </application>
 
 </manifest>

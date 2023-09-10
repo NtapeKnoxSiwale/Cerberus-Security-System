@@ -24,8 +24,8 @@
     <string name="action_sign_in">Sign in with your account</string>
     <string name="stop_alarm">Stop Alarm</string>
     <string name="_0_kg">0 kg</string>
-    <string name="room_2">Room 2</string>
-    <string name="room_1">Room 1</string>
+    <string name="room_2">Room 2: </string>
+    <string name="room_1">Room 1: </string>
     <string name="product_id">Product ID</string>
     <string name="setup">Setup</string>
     <string name="product_key">Product Key</string>
@@ -70,6 +70,8 @@
     <string name="full_screen">Full-screen</string>
     <string name="to">to</string>
     <string name="min">min</string>
+    <string name="activate_alarms">Activate Alarm</string>
+    <string name="phone_number">Phone Number</string>
 
     <string-array name="room_options">
         <item>Room 1</item>
